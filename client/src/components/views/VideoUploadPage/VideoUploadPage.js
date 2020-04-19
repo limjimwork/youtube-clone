@@ -48,7 +48,17 @@ function VideoUploadPage() {
     formData.append("file", files[0]);
     axios.post("/api/videos/uploadfiles", formData, config).then((res) => {
       if (res.data.success) {
-        console.log(res.data);
+        let variable = {
+          url: res.data.url,
+          fileName: res.data.fileName,
+        };
+        axios.post("/api/videos/thumbnail", variable).then((res) => {
+          if (res.data.success) {
+            console.log(res.data);
+          } else {
+            alert("Failed to create a thumbnail.");
+          }
+        });
       } else {
         alert("Failed to Upload video.");
       }
