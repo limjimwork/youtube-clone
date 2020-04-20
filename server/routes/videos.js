@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// const { Video } = require("../models/Video");
-// const { auth } = require("../middleware/auth");
+const { Video } = require("../models/Video");
 
 const multer = require("multer");
 const ffmpeg = require("fluent-ffmpeg");
@@ -30,7 +29,7 @@ let storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single("file");
 
 router.post("/uploadfiles", (req, res) => {
-  // 비디오를 서버에 저장한다.
+  // 비디오를 저장한다.
   upload(req, res, (err) => {
     if (err) {
       return res.json({ success: false, err });
@@ -40,6 +39,15 @@ router.post("/uploadfiles", (req, res) => {
       url: res.req.file.path,
       fileName: res.req.file.filename,
     });
+  });
+});
+
+router.post("/uploadVideo", (req, res) => {
+  // 비디오를 서버에 저장한다.
+  const video = new Video(req.body);
+  video.save((err, doc) => {
+    if (err) return res.json({ success: false, err });
+    res.status(200).json({ success: true });
   });
 });
 

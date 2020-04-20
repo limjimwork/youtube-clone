@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Typography, Button, Form, message, Input, Icon } from "antd";
 import Dropzone from "react-dropzone";
 import axios from "axios";
@@ -18,11 +19,15 @@ const categoryOptions = [
   { value: 3, label: "Pets & Animals" },
 ];
 
-function VideoUploadPage() {
+function VideoUploadPage(props) {
+  const user = useSelector((state) => state.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [Private, setPrivate] = useState(0);
-  const [Category, setCategory] = useState(0);
+  const [privacy, setPrivacy] = useState(0);
+  const [category, setCategory] = useState(0);
+  const [filePath, setFilePath] = useState("");
+  const [duration, setDuration] = useState("");
+  const [thumbnailPath, setThumbnailPath] = useState("");
 
   const onTitleChange = (e) => {
     setTitle(e.currentTarget.value);
@@ -32,8 +37,8 @@ function VideoUploadPage() {
     setDescription(e.currentTarget.value);
   };
 
-  const onPrivateChange = (e) => {
-    setPrivate(e.currentTarget.value);
+  const onPrivacyChange = (e) => {
+    setPrivacy(e.currentTarget.value);
   };
 
   const onCategoryChange = (e) => {
@@ -52,9 +57,13 @@ function VideoUploadPage() {
           url: res.data.url,
           fileName: res.data.fileName,
         };
+
+        setFilePath(res.data.url);
+
         axios.post("/api/videos/thumbnail", variable).then((res) => {
           if (res.data.success) {
-            console.log(res.data);
+            setDuration(res.data.fileDuration);
+            setThumbnailPath(res.data.url);
           } else {
             alert("Failed to create a thumbnail.");
           }
@@ -65,12 +74,38 @@ function VideoUploadPage() {
     });
   };
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    const variables = {
+      writer: user.userData._id,
+      title,
+      description,
+      privacy,
+      filePath,
+      category,
+      duration,
+      thumbnail: thumbnailPath,
+    };
+
+    axios.post("/api/videos/uploadVideo", variables).then((res) => {
+      if (res.data.success) {
+        message.success("Success to upload the video.");
+        setTimeout(() => {
+          props.history.push("/");
+        }, 3000);
+      } else {
+        alert("Failed to upload the video.");
+      }
+    });
+  };
+
   return (
     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <Title level={2}>Upload Video</Title>
       </div>
-      <Form onSubmit>
+      <Form onSubmit={onSubmit}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {/* Drop zone */}
           <Dropzone onDrop={onDrop} multiple={false} maxSize={100000000}>
@@ -92,29 +127,40 @@ function VideoUploadPage() {
             )}
           </Dropzone>
           {/* Thumbnail */}
-          <div>
-            <img src alt />
-          </div>
+          {thumbnailPath && (
+            <div>
+              <img
+                src={`http://localhost:5000/${thumbnailPath}`}
+                alt="thumbnail"
+              />
+            </div>
+          )}
         </div>
         <label>Title</label>
         <Input onChange={onTitleChange} value={title} />
         <label>Description</label>
         <TextArea onChange={onDescriptionChange} value={description} />
-        <select onChange={onPrivateChange}>
+        <select
+          onChange={onPrivacyChange}
+          style={{ display: "block", marginBottom: "5px" }}
+        >
           {privateOptions.map((item, idx) => (
             <option key={idx} value={item.value}>
               {item.label}
             </option>
           ))}
         </select>
-        <select onChange={onCategoryChange}>
+        <select
+          onChange={onCategoryChange}
+          style={{ display: "block", marginBottom: "5px" }}
+        >
           {categoryOptions.map((item, idx) => (
             <option key={idx} value={item.value}>
               {item.label}
             </option>
           ))}
         </select>
-        <Button type="primary" size="large" onClick>
+        <Button type="primary" size="large" onClick={onSubmit}>
           Submit
         </Button>
       </Form>
