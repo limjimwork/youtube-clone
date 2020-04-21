@@ -6,17 +6,23 @@ import { Card, Avatar, Typography, Row, Col } from "antd";
 const { Title } = Typography;
 const { Meta } = Card;
 
-function LandingPage() {
+function SubscriptionPage() {
   const [videos, setVideos] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/videos/getVideos").then((res) => {
-      if (res.data.success) {
-        setVideos(res.data.videos);
-      } else {
-        alert("Failed to lander videos.");
-      }
-    });
+    const subscriptionVariables = {
+      userFrom: localStorage.getItem("userId"),
+    };
+
+    axios
+      .post("/api/videos/getSubscriptionVideos", subscriptionVariables)
+      .then((res) => {
+        if (res.data.success) {
+          setVideos(res.data.videos);
+        } else {
+          alert("Failed to lander videos.");
+        }
+      });
   }, []);
 
   const RenderCards = videos.map((video, idx) => {
@@ -53,10 +59,10 @@ function LandingPage() {
 
   return (
     <div style={{ width: "85%", margin: "3rem auto" }}>
-      <Title level={2}>Recommend</Title>
+      <Title level={2}>Subscription</Title>
       <Row gutter={[32, 16]}>{RenderCards}</Row>
     </div>
   );
 }
 
-export default LandingPage;
+export default SubscriptionPage;
