@@ -23,7 +23,7 @@ function VideoDetailPage(props) {
   }, []);
 
   if (videoDetail.writer) {
-    const subscribeButton = videoDetail.writer._id === userId && (
+    const subscribeButton = videoDetail.writer._id !== userId && (
       <Subscribe userTo={videoDetail.writer} userFrom={userId} />
     );
 
