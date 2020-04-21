@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+
 import { Row, Col, Avatar, List } from "antd";
+
 import SideVideo from "./Sections/SideVideo";
 import Subscribe from "./Sections/Subscribe";
 
 function VideoDetailPage(props) {
   const videoId = props.match.params.videoId;
+  const userId = localStorage.getItem("userId");
   const variable = { videoId };
   const [videoDetail, setVideoDetail] = useState([]);
 
@@ -20,6 +23,10 @@ function VideoDetailPage(props) {
   }, []);
 
   if (videoDetail.writer) {
+    const subscribeButton = videoDetail.writer._id === userId && (
+      <Subscribe userTo={videoDetail.writer} userFrom={userId} />
+    );
+
     return (
       <Row gutter={[16, 16]}>
         <Col lg={18} xs={24}>
@@ -29,7 +36,7 @@ function VideoDetailPage(props) {
               src={`http://localhost:5000/${videoDetail.filePath}`}
               controls
             />
-            <List.Item actions={[<Subscribe userTo={videoDetail.writer} />]}>
+            <List.Item actions={[subscribeButton]}>
               <List.Item.Meta
                 avatar={<Avatar src={videoDetail.writer.image} />}
                 title={videoDetail.writer.name}

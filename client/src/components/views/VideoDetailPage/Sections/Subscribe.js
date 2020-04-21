@@ -18,7 +18,7 @@ function Subscribe(props) {
 
     let subscribedVariable = {
       userTo: props.userTo,
-      userFrom: localStorage.getItem("userId"),
+      userFrom: props.userFrom,
     };
 
     Axios.post("/api/subscribe/subscribed", subscribedVariable).then((res) => {
@@ -33,7 +33,7 @@ function Subscribe(props) {
   const onSubscribe = () => {
     let subscribeVariable = {
       userTo: props.userTo,
-      userFrom: localStorage.getItem("userId"),
+      userFrom: props.userFrom,
     };
 
     if (subscribed) {
