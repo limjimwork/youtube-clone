@@ -15,7 +15,7 @@ function ReplyComment(props) {
     });
 
     setChildCommentNumber(commentNumber);
-  }, []);
+  }, [props.commentLists]);
 
   const renderReplyComment = (parentCommentId) => {
     return props.commentLists.map(

@@ -29,6 +29,7 @@ function SingleComment(props) {
     Axios.post("/api/comment/saveComment", variables).then((res) => {
       if (res.data.success) {
         setCommentValue("");
+        setOpenReply(false);
         props.refreshFunction(res.data.result);
       } else {
         alert("Failed to save the comment.");
